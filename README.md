@@ -1,5 +1,7 @@
 # AI-PhD.SKILL
 
+@ [Xiaohongshu / RedNote](https://www.xiaohongshu.com/user/profile/673b4c44000000001d02d37e)
+
 我叫 [Albert Wenhui Tan](https://scholar.google.com/citations?user=cELItK0AAAAJ&hl=en)，是人大高瓴人工智能学院的博士生，主要研究 LLMs、Embodied AI。
 
 我相信开源是该领域（甚至是人类社会）发展的重要动力。因此，我想把我在读博/科研期间的经验，和一些个人看法开源，所以有了这个 repo：AI-PhD.SKILL
