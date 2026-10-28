@@ -1,0 +1,38 @@
+RL101 7.1｜一条 reward 怎么更新每个 token？
+
+今天来讲讲 RL，一个我长期 know-what、但不完全 know-why 和 know-how 的话题。
+
+我能认出 GRPO，也知道 ratio、clip、KL 大概在做什么。但继续往下追：一条回答只有一个 reward，为什么能更新几千个 token？baseline 为什么可以直接减？G、Q、V、A 是环境给的、数学定义的，还是模型估出来的？Monte Carlo、TD 和 GAE 又是怎么连起来的？理解就很容易断层。
+
+所以这一篇先不讲 PPO、GRPO 和 DAPO，只把 reward 到 GAE 这条路走通。图片负责推导，下面留一份 quick notes / cheatsheet，方便看到后面时回来查。
+
+【Quick notes：先分清这些量】
+
+• r_t，reward：第 t 步之后，环境或 verifier 实际给出的即时反馈。
+• R(x,y)，final reward：整条回答结束后的最终得分。本篇的简化场景只有这个终局奖励。
+• G_t，return：从第 t 步开始，未来所有 rewards 的折扣和。rollout 前它是随机变量；完整 rollout 后，这条轨迹上的 realized G_t 可以直接计算，不是 critic 的预测。
+• Q^π(s,a)，action value：在状态 s 先选动作 a，之后继续按策略 π 行动的期望 return。
+• V^π(s)，state value：从状态 s 开始继续按策略 π 行动的期望 return。
+• A^π(s,a) = Q^π(s,a) - V^π(s)，advantage：动作 a 比当前策略在同一状态下的平均选择好多少。
+• V_φ(s)：critic 对理论 V^π(s) 的学习近似，可能准，也可能不准。
+• Â_t：由 rollout 和 critic 算出的 advantage estimator，也是最终送进 actor loss 的 token 更新权重。
+
+一句话分类：r_t 是观测反馈，realized G_t 是轨迹上算出来的样本；Q^π、V^π、A^π 是通常未知的理论条件期望；V_φ、Â_t 才是我们训练或计算出来的近似。
+
+【Quick notes：常见缩写】
+
+• RL = Reinforcement Learning，强化学习。
+• PG = Policy Gradient，策略梯度。
+• MDP = Markov Decision Process，马尔可夫决策过程。
+• MC = Monte Carlo，蒙特卡洛；在这里指通过 rollout 样本近似期望。MC return 通常表示跑到 episode 结束，用完整未来 rewards 算 return，不 bootstrap。
+• TD = Temporal-Difference learning，时序差分学习；不等完整 return，用一步真实 reward 加下一状态 value 构造 target。
+• GAE = Generalized Advantage Estimation，广义优势估计；对未来 TD errors 做指数加权，混合不同长度的 bootstrap。
+
+【四句带走】
+
+1. Policy Gradient 负责把不可导的 reward 接到可导的 token log-probability。
+2. Baseline 不依赖当前动作时，减掉它不会改变期望 policy gradient；V^π(s) 是最自然的比较基准之一。
+3. TD 是“自举的艺术”：下一状态的旧 value，把当前状态的新 value 举起来；终止状态和真实 reward 负责提供锚点。
+4. GAE 只解决“每个 token 的 advantage 怎样估计”。下一篇 7.2 再讲 PPO 怎样使用它、GRPO 怎样绕开 critic，以及 DAPO 修了哪些 failure modes。
+
+#强化学习 #LLM #大模型 #RLHF #PPO #GRPO #机器学习 #AI学习笔记

@@ -1,0 +1,17 @@
+RL101 7.2｜GAE 之后，怎样稳定更新 LLM？
+
+7.1 已把 reward 推到 advantage。这篇继续：怎样复用 rollout，并限制 policy update？
+
+路线：GAE → ratio → TRPO → PPO → GRPO → Dr.GRPO / DAPO / GSPO。重点解释 clip 梯度、ratio 对称性与 entropy collapse。
+
+【Quick notes】
+• TRPO = Trust Region Policy Optimization：用 average KL constraint 控制步长。
+• PPO = Proximal Policy Optimization：clipped surrogate，一阶、多 epoch。
+• GRPO = Group Relative Policy Optimization：用同题 group rewards 算 advantage，省去 critic。
+• Dr.GRPO = GRPO Done Right：去掉 length 与 group-std normalization。
+• DAPO = Decoupled Clip and Dynamic Sampling Policy Optimization：Clip-Higher、动态采样、token-level loss、overlong shaping。
+• GSPO = Group Sequence Policy Optimization：用 sequence ratio clip 整条回答。
+
+易混点：π_old 是 rollout policy 和 ratio 分母；π_ref 是可选 anchor。Clip 只截断沿 advantage 方向的过度改善，ratio 超界仍可能有梯度。固定 lower=0.8 时，乘法对称 upper=1/0.8=1.25；PPO additive upper=1.2。
+
+#强化学习 #LLM #PPO #GRPO #DAPO #GSPO
